@@ -34,7 +34,7 @@ loadSprite('blue-evil-shroom', 'SvV4ueD.png')
 loadSprite('blue-surprise', 'RMqCc1G.png')
 
 
-scene("game", ({ score }) => {
+scene("game", ({ level, score }) => {
 
     layers(['bg', 'obj', 'ui'], 'obj')
 
@@ -66,6 +66,7 @@ scene("game", ({ score }) => {
         '^': [sprite('evil-shroom'), solid(), 'dangerous'],
         '#': [sprite('mushroom'), solid(), 'mushroom', body()],
     }
+
     const gameLevel = addLevel(map, levelCfg)
 
     const scoreLabel = add([
@@ -76,7 +77,8 @@ scene("game", ({ score }) => {
             value: score,
         }
     ])
-    add([text('level' + 'test', pos(4, 6))])
+
+    add([text('level ' + parseInt(level + 1)), pos(40, 6)])
 
     function big() {
         let timer = 0
@@ -141,6 +143,16 @@ scene("game", ({ score }) => {
         scoreLabel.text = scoreLabel.value
     })
 
+    player.collides('pipe', () => {
+        keyPress('down', () => {
+            go('game', {
+                level: (level + 1),
+                score: scoreLabel.value
+            })
+        })
+    })
+
+
 
 
     action('dangerous', (d) => {
@@ -187,4 +199,4 @@ scene('lose', ({ score }) => {
     add([text("GAME OVER\n\n" + score, 32), origin('center'), pos(width() / 2, height() / 2)])
 })
 
-start("game", { score: 0 })
+start("game", { level: 0, score: 0 })
