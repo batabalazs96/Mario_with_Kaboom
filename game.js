@@ -166,10 +166,16 @@ scene("game", ({ level, score }) => {
 
     player.collides('pipe', () => {
         keyPress('down', () => {
-            go('game', {
-                level: (level + 1),
-                score: scoreLabel.value
-            })
+            if (level < 1) {
+                go('game', {
+                    level: (level + 1),
+                    score: scoreLabel.value
+                })
+            } else {
+
+                go('win', { score: score })
+            }
+
         })
     })
 
@@ -218,6 +224,10 @@ scene("game", ({ level, score }) => {
 })
 scene('lose', ({ score }) => {
     add([text("GAME OVER\n\n" + score, 32), origin('center'), pos(width() / 2, height() / 2)])
+})
+
+scene('win', ({ score }) => {
+    add([text("WIN\n\n" + score, 32), origin('center'), pos(width() / 2, height() / 2)])
 })
 
 start("game", { level: 0, score: 0 })
