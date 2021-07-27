@@ -6,6 +6,9 @@ kaboom({
     clearColor: [0, 0, 0, 1],
 })
 
+const SPEED = 120;
+const JUMP_FORCE = 400;
+
 loadRoot('https://i.imgur.com/')
 loadSprite('coin', 'wbKxhcd.png')
 loadSprite('evil-shroom', 'KPO3fR9.png')
@@ -76,6 +79,18 @@ scene("game", () => {
         body(),
         origin('bot')
     ])
+
+
+
+    keyDown("left", () => {
+        player.move(-SPEED, 0);
+    });
+    keyDown("right", () => {
+        player.move(SPEED, 0);
+    });
+    keyPress("up", () => {
+        player.jump(JUMP_FORCE);
+    });
 })
 
 start("game")
