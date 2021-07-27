@@ -8,6 +8,10 @@ kaboom({
 
 const SPEED = 120;
 const JUMP_FORCE = 400;
+const FALL_DEATH = 400;
+const ENEMY_SPEED = 30;
+
+let isJumping = true
 
 loadRoot('https://i.imgur.com/')
 loadSprite('coin', 'wbKxhcd.png')
@@ -30,7 +34,8 @@ loadSprite('blue-evil-shroom', 'SvV4ueD.png')
 loadSprite('blue-surprise', 'RMqCc1G.png')
 
 
-scene("game", () => {
+scene("game", ({ score }) => {
+
     layers(['bg', 'obj', 'ui'], 'obj')
 
     const map = [
@@ -64,11 +69,11 @@ scene("game", () => {
     const gameLevel = addLevel(map, levelCfg)
 
     const scoreLabel = add([
-        text('test'),
+        text(score),
         pos(30, 6),
         layer('ui'),
         {
-            value: 'test',
+            value: score,
         }
     ])
     add([text('level' + 'test', pos(4, 6))])
@@ -136,15 +141,50 @@ scene("game", () => {
         scoreLabel.text = scoreLabel.value
     })
 
+
+
+    action('dangerous', (d) => {
+        d.move(-ENEMY_SPEED, 0)
+    })
+
+    player.collides('dangerous', (d) => {
+        if (isJumping) {
+            destroy(d)
+            scoreLabel.value++
+            scoreLabel.text = scoreLabel.value
+        } else {
+            go('lose', { score: scoreLabel.value })
+        }
+    })
+
+    player.action(() => {
+        camPos(player.pos)
+        if (player.pos.y >= FALL_DEATH) {
+            go('lose', { score: scoreLabel.value })
+        }
+    })
+
     keyDown("left", () => {
         player.move(-SPEED, 0);
     });
     keyDown("right", () => {
         player.move(SPEED, 0);
     });
-    keyPress("up", () => {
-        player.jump(JUMP_FORCE);
-    });
+    player.action(() => {
+        if (player.grounded()) {
+            isJumping = false
+        }
+    })
+
+    keyPress('up', () => {
+        if (player.grounded()) {
+            isJumping = true
+            player.jump(JUMP_FORCE)
+        }
+    })
+})
+scene('lose', ({ score }) => {
+    add([text("GAME OVER\n\n" + score, 32), origin('center'), pos(width() / 2, height() / 2)])
 })
 
-start("game")
+start("game", { score: 0 })
