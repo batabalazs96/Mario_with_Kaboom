@@ -93,8 +93,8 @@ scene("game", () => {
                 timer = 0
                 isBig = false
             },
-            biggifí() {
-                this.scale = vec2(2)
+            biggify() {
+                this.scale = vec2(3)
                 timer = time
                 isBig = true
             }
@@ -108,8 +108,33 @@ scene("game", () => {
         big(),
         origin('bot')
     ])
+    action('mushroom', (m) => {
+        m.move(10, 0)
+    })
 
+    player.on("headbump", (obj) => {
+        if (obj.is('coin-surprise')) {
+            gameLevel.spawn('$', obj.gridPos.sub(0, 1))
+            destroy(obj)
+            gameLevel.spawn('}', obj.gridPos.sub(0, 0))
+        }
+        if (obj.is('mushroom-surprise')) {
+            gameLevel.spawn('#', obj.gridPos.sub(0, 1))
+            destroy(obj)
+            gameLevel.spawn('}', obj.gridPos.sub(0, 0))
+        }
+    })
 
+    player.collides('mushroom', (m) => {
+        destroy(m)
+        player.biggify(6)
+    })
+
+    player.collides('coin', (c) => {
+        destroy(c)
+        scoreLabel.value++
+        scoreLabel.text = scoreLabel.value
+    })
 
     keyDown("left", () => {
         player.move(-SPEED, 0);
